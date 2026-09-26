@@ -1,10 +1,12 @@
 package com.servicedesk.servicedesk_backend.service;
 
+import com.servicedesk.servicedesk_backend.dto.LoginRequest;
 import com.servicedesk.servicedesk_backend.dto.RegisterRequest;
 import com.servicedesk.servicedesk_backend.dto.UserResponse;
 import com.servicedesk.servicedesk_backend.entity.Role;
 import com.servicedesk.servicedesk_backend.entity.User;
 import com.servicedesk.servicedesk_backend.exception.EmailAlreadyExistsException;
+import com.servicedesk.servicedesk_backend.exception.InvalidCredentialsException;
 import com.servicedesk.servicedesk_backend.repository.RoleRepository;
 import com.servicedesk.servicedesk_backend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +33,7 @@ public class AuthService {
         Role customerRole = roleRepository.findByName("CUSTOMER").
                 orElseThrow(() ->
                 new RuntimeException("Customer Role Not Found"));
+
         String HashedPassword = passwordEncoder.encode(request.getPassword());
         User user = new User(
                 request.getName(),
@@ -45,5 +48,17 @@ public class AuthService {
                 savedUser.getEmail()
         );
 
+    }
+    public User login(LoginRequest request){
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid email or password"));
+        if(!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        )){
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+        return user;
     }
 }
