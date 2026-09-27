@@ -56,4 +56,15 @@ public class GlobalExceptionHandler {
                 "message",
                 exception.getMessage());
     }
+
+    @ExceptionHandler(InvalidTicketStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInvalidTicketStatus(
+            InvalidTicketStatusException exception) {
+
+        return Map.of(
+                "message",
+                exception.getMessage()
+        );
+    }
 }
