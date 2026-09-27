@@ -1,6 +1,7 @@
 package com.servicedesk.servicedesk_backend.controller;
 
 import com.servicedesk.servicedesk_backend.dto.LoginRequest;
+import com.servicedesk.servicedesk_backend.dto.LoginResponse;
 import com.servicedesk.servicedesk_backend.dto.RegisterRequest;
 import com.servicedesk.servicedesk_backend.dto.UserResponse;
 import com.servicedesk.servicedesk_backend.entity.User;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public User login(@Valid @RequestBody LoginRequest request){
+    public LoginResponse login(@Valid @RequestBody LoginRequest request){
         return authService.login(request);
     }
 }

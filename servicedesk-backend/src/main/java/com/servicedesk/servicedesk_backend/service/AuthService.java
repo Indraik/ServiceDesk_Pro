@@ -1,6 +1,7 @@
 package com.servicedesk.servicedesk_backend.service;
 
 import com.servicedesk.servicedesk_backend.dto.LoginRequest;
+import com.servicedesk.servicedesk_backend.dto.LoginResponse;
 import com.servicedesk.servicedesk_backend.dto.RegisterRequest;
 import com.servicedesk.servicedesk_backend.dto.UserResponse;
 import com.servicedesk.servicedesk_backend.entity.Role;
@@ -9,22 +10,28 @@ import com.servicedesk.servicedesk_backend.exception.EmailAlreadyExistsException
 import com.servicedesk.servicedesk_backend.exception.InvalidCredentialsException;
 import com.servicedesk.servicedesk_backend.repository.RoleRepository;
 import com.servicedesk.servicedesk_backend.repository.UserRepository;
+import com.servicedesk.servicedesk_backend.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final JwtService jwtService;
+
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            RoleRepository roleRepository
+            RoleRepository roleRepository,
+            JwtService jwtService
     ){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.jwtService = jwtService;
     }
     public UserResponse register(RegisterRequest request){
         if(userRepository.existsByEmail(request.getEmail())){
@@ -49,7 +56,8 @@ public class AuthService {
         );
 
     }
-    public User login(LoginRequest request){
+
+    public LoginResponse login(LoginRequest request){
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
                         new InvalidCredentialsException("Invalid email or password"));
@@ -59,6 +67,7 @@ public class AuthService {
         )){
             throw new InvalidCredentialsException("Invalid email or password");
         }
-        return user;
+        String token = jwtService.generateToken(user.getEmail());
+        return new LoginResponse(token);
     }
 }
