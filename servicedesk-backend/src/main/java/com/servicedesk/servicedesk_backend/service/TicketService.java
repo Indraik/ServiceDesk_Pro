@@ -2,12 +2,10 @@ package com.servicedesk.servicedesk_backend.service;
 
 import com.servicedesk.servicedesk_backend.dto.CreateTicketRequest;
 import com.servicedesk.servicedesk_backend.dto.TicketResponse;
-import com.servicedesk.servicedesk_backend.entity.Ticket;
-import com.servicedesk.servicedesk_backend.entity.TicketStatus;
-import com.servicedesk.servicedesk_backend.entity.TicketStatusHistory;
-import com.servicedesk.servicedesk_backend.entity.User;
+import com.servicedesk.servicedesk_backend.entity.*;
 import com.servicedesk.servicedesk_backend.exception.InvalidTicketStatusException;
 import com.servicedesk.servicedesk_backend.exception.ResourceNotFoundException;
+import com.servicedesk.servicedesk_backend.repository.TicketAssignmentHistoryRepository;
 import com.servicedesk.servicedesk_backend.repository.TicketRepository;
 import com.servicedesk.servicedesk_backend.repository.TicketStatusHistoryRepository;
 import com.servicedesk.servicedesk_backend.repository.UserRepository;
@@ -23,14 +21,17 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
     private final TicketStatusHistoryRepository ticketStatusHistoryRepository;
+    private final TicketAssignmentHistoryRepository ticketAssignmentHistoryRepository;
 
     public TicketService(
             TicketRepository ticketRepository,
             UserRepository userRepository,
-            TicketStatusHistoryRepository ticketStatusHistoryRepository) {
+            TicketStatusHistoryRepository ticketStatusHistoryRepository,
+            TicketAssignmentHistoryRepository ticketAssignmentHistoryRepository) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
         this.ticketStatusHistoryRepository = ticketStatusHistoryRepository;
+        this.ticketAssignmentHistoryRepository = ticketAssignmentHistoryRepository;
     }
 
     public TicketResponse createTicket(
@@ -100,9 +101,15 @@ public class TicketService {
         return toTicketResponse(ticket);
     }
 
-    public  TicketResponse assignTicket(
+    public TicketResponse assignTicket(
             Long ticketId,
-            Long agentId){
+            Long agentId,
+            String adminEmail){
+
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Admin not found"));
+
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(()->
                         new ResourceNotFoundException("Ticket not found"));
@@ -119,6 +126,16 @@ public class TicketService {
         ticket.setAssignedTo(agent);
         ticket.setStatus(TicketStatus.ASSIGNED);
         ticket.setUpdatedAt(LocalDateTime.now());
+
+        TicketAssignmentHistory history =
+                new TicketAssignmentHistory();
+
+        history.setTicket(ticket);
+        history.setAssignedTo(agent);
+        history.setAssignedBy(admin);
+        history.setAssignedAt(LocalDateTime.now());
+
+        ticketAssignmentHistoryRepository.save(history);
 
         Ticket savedTicket = ticketRepository.save(ticket);
 

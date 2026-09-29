@@ -54,10 +54,15 @@ public class TicketController {
     @PreAuthorize("hasRole('ADMIN')")
     public TicketResponse assignTicket(
             @PathVariable Long id,
-            @Valid @RequestBody AssignTicketRequest request){
+            @Valid @RequestBody AssignTicketRequest request,
+            Authentication authentication) {
+
+        String adminEmail = authentication.getName();
+
         return ticketService.assignTicket(
                 id,
-                request.getAgentId()
+                request.getAgentId(),
+                adminEmail
         );
     }
 
