@@ -1,52 +1,16 @@
 package com.servicedesk.servicedesk_backend.repository;
 
-import com.servicedesk.servicedesk_backend.entity.Priority;
 import com.servicedesk.servicedesk_backend.entity.Ticket;
-import com.servicedesk.servicedesk_backend.entity.TicketStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
 
     Page<Ticket> findByCreatedByEmail(String email, Pageable pageable);
     Optional<Ticket> findByIdAndCreatedByEmail(Long id, String email);
-    Page<Ticket> findByCreatedByEmailAndStatus(
-            String email,
-            TicketStatus status,
-            Pageable pageable);
-
-    Page<Ticket> findByCreatedByEmailAndPriority(
-            String email,
-            Priority priority,
-            Pageable pageable);
-
-    Page<Ticket> findByCreatedByEmailAndStatusAndPriority(
-            String email,
-            TicketStatus status,
-            Priority priority,
-            Pageable pageable);
-
-    Page<Ticket> findByCreatedByEmailAndTitleContainingIgnoreCaseOrCreatedByEmailAndDescriptionContainingIgnoreCase(
-            String email1,
-            String titleKeyword,
-            String email2,
-            String descriptionKeyword,
-            Pageable pageable);
-
-    Page<Ticket> findByCreatedByEmailAndStatusAndPriorityAndTitleContainingIgnoreCaseOrCreatedByEmailAndStatusAndPriorityAndDescriptionContainingIgnoreCase(
-            String email1,
-            TicketStatus status1,
-            Priority priority1,
-            String titleKeyword,
-            String email2,
-            TicketStatus status2,
-            Priority priority2,
-            String descriptionKeyword,
-            Pageable pageable);
-
 
 }

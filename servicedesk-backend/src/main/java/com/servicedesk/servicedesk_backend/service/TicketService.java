@@ -9,8 +9,10 @@ import com.servicedesk.servicedesk_backend.repository.TicketAssignmentHistoryRep
 import com.servicedesk.servicedesk_backend.repository.TicketRepository;
 import com.servicedesk.servicedesk_backend.repository.TicketStatusHistoryRepository;
 import com.servicedesk.servicedesk_backend.repository.UserRepository;
+import com.servicedesk.servicedesk_backend.specification.TicketSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -83,7 +85,7 @@ public class TicketService {
                 ticket.getUpdatedAt()
         );
     }
-    
+
     public Page<TicketResponse> getMyTickets(
             String email,
             String search,
@@ -91,72 +93,19 @@ public class TicketService {
             Priority priority,
             Pageable pageable) {
 
-        Page<Ticket> tickets;
+        Specification<Ticket> specification =
+                TicketSpecification.filterTickets(
+                        email,
+                        search,
+                        status,
+                        priority
+                );
 
-        if (search != null && !search.isBlank()
-                && status != null
-                && priority != null) {
-
-            tickets = ticketRepository
-                    .findByCreatedByEmailAndStatusAndPriorityAndTitleContainingIgnoreCaseOrCreatedByEmailAndStatusAndPriorityAndDescriptionContainingIgnoreCase(
-                            email,
-                            status,
-                            priority,
-                            search,
-                            email,
-                            status,
-                            priority,
-                            search,
-                            pageable
-                    );
-
-        } else if (search != null && !search.isBlank()) {
-
-            tickets = ticketRepository
-                    .findByCreatedByEmailAndTitleContainingIgnoreCaseOrCreatedByEmailAndDescriptionContainingIgnoreCase(
-                            email,
-                            search,
-                            email,
-                            search,
-                            pageable
-                    );
-
-        } else if (status != null && priority != null) {
-
-            tickets = ticketRepository
-                    .findByCreatedByEmailAndStatusAndPriority(
-                            email,
-                            status,
-                            priority,
-                            pageable
-                    );
-
-        } else if (status != null) {
-
-            tickets = ticketRepository
-                    .findByCreatedByEmailAndStatus(
-                            email,
-                            status,
-                            pageable
-                    );
-
-        } else if (priority != null) {
-
-            tickets = ticketRepository
-                    .findByCreatedByEmailAndPriority(
-                            email,
-                            priority,
-                            pageable
-                    );
-
-        } else {
-
-            tickets = ticketRepository
-                    .findByCreatedByEmail(
-                            email,
-                            pageable
-                    );
-        }
+        Page<Ticket> tickets =
+                ticketRepository.findAll(
+                        specification,
+                        pageable
+                );
 
         return tickets.map(this::toTicketResponse);
     }
