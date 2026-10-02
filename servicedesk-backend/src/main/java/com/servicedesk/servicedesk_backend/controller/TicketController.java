@@ -41,12 +41,20 @@ public class TicketController {
     @GetMapping
     public Page<TicketResponse> getMyTickets(
             Authentication authentication,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) TicketStatus status,
             @RequestParam(required = false) Priority priority,
-            Pageable pageable){
+            Pageable pageable) {
+
         String email = authentication.getName();
 
-        return ticketService.getMyTickets(email,status, priority, pageable);
+        return ticketService.getMyTickets(
+                email,
+                search,
+                status,
+                priority,
+                pageable
+        );
     }
 
     @GetMapping("/{id}")

@@ -83,53 +83,79 @@ public class TicketService {
                 ticket.getUpdatedAt()
         );
     }
-
-//    public List<TicketResponse> getMyTickets(String email){
-//        List<Ticket> tickets = ticketRepository.findByCreatedByEmail(email);
-//
-//        return tickets.stream()
-//                .map(this::toTicketResponse)
-//                .toList();
-//    }
-//    public Page<TicketResponse> getMyTickets(String email, Pageable pageable){
-//        Page<Ticket> tickets = ticketRepository.findByCreatedByEmail(
-//                email,
-//                pageable
-//        );
-//        return tickets.map(this::toTicketResponse);
-//    }
+    
     public Page<TicketResponse> getMyTickets(
             String email,
+            String search,
             TicketStatus status,
             Priority priority,
             Pageable pageable) {
 
         Page<Ticket> tickets;
 
-        if (status != null && priority != null) {
-            tickets = ticketRepository.findByCreatedByEmailAndStatusAndPriority(
-                    email,
-                    status,
-                    priority,
-                    pageable
-            );
-        }else if (status != null) {
-            tickets = ticketRepository.findByCreatedByEmailAndStatus(
-                    email,
-                    status,
-                    pageable
-            );
+        if (search != null && !search.isBlank()
+                && status != null
+                && priority != null) {
+
+            tickets = ticketRepository
+                    .findByCreatedByEmailAndStatusAndPriorityAndTitleContainingIgnoreCaseOrCreatedByEmailAndStatusAndPriorityAndDescriptionContainingIgnoreCase(
+                            email,
+                            status,
+                            priority,
+                            search,
+                            email,
+                            status,
+                            priority,
+                            search,
+                            pageable
+                    );
+
+        } else if (search != null && !search.isBlank()) {
+
+            tickets = ticketRepository
+                    .findByCreatedByEmailAndTitleContainingIgnoreCaseOrCreatedByEmailAndDescriptionContainingIgnoreCase(
+                            email,
+                            search,
+                            email,
+                            search,
+                            pageable
+                    );
+
+        } else if (status != null && priority != null) {
+
+            tickets = ticketRepository
+                    .findByCreatedByEmailAndStatusAndPriority(
+                            email,
+                            status,
+                            priority,
+                            pageable
+                    );
+
+        } else if (status != null) {
+
+            tickets = ticketRepository
+                    .findByCreatedByEmailAndStatus(
+                            email,
+                            status,
+                            pageable
+                    );
+
         } else if (priority != null) {
-            tickets = ticketRepository.findByCreatedByEmailAndPriority(
-                    email,
-                    priority,
-                    pageable
-            );
+
+            tickets = ticketRepository
+                    .findByCreatedByEmailAndPriority(
+                            email,
+                            priority,
+                            pageable
+                    );
+
         } else {
-            tickets = ticketRepository.findByCreatedByEmail(
-                    email,
-                    pageable
-            );
+
+            tickets = ticketRepository
+                    .findByCreatedByEmail(
+                            email,
+                            pageable
+                    );
         }
 
         return tickets.map(this::toTicketResponse);

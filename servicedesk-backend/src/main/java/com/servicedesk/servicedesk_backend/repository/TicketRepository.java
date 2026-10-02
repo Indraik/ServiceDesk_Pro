@@ -30,5 +30,23 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             Priority priority,
             Pageable pageable);
 
+    Page<Ticket> findByCreatedByEmailAndTitleContainingIgnoreCaseOrCreatedByEmailAndDescriptionContainingIgnoreCase(
+            String email1,
+            String titleKeyword,
+            String email2,
+            String descriptionKeyword,
+            Pageable pageable);
+
+    Page<Ticket> findByCreatedByEmailAndStatusAndPriorityAndTitleContainingIgnoreCaseOrCreatedByEmailAndStatusAndPriorityAndDescriptionContainingIgnoreCase(
+            String email1,
+            TicketStatus status1,
+            Priority priority1,
+            String titleKeyword,
+            String email2,
+            TicketStatus status2,
+            Priority priority2,
+            String descriptionKeyword,
+            Pageable pageable);
+
 
 }
