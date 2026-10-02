@@ -1,9 +1,6 @@
 package com.servicedesk.servicedesk_backend.controller;
 
-import com.servicedesk.servicedesk_backend.dto.AssignTicketRequest;
-import com.servicedesk.servicedesk_backend.dto.CreateTicketRequest;
-import com.servicedesk.servicedesk_backend.dto.TicketResponse;
-import com.servicedesk.servicedesk_backend.dto.UpdateTicketStatusRequest;
+import com.servicedesk.servicedesk_backend.dto.*;
 import com.servicedesk.servicedesk_backend.entity.Category;
 import com.servicedesk.servicedesk_backend.entity.Priority;
 import com.servicedesk.servicedesk_backend.entity.Ticket;
@@ -97,6 +94,21 @@ public class TicketController {
         return ticketService.updateStatus(
                 id,
                 request.getStatus(),
+                email
+        );
+    }
+
+    @PutMapping("/{ticketId}")
+    public TicketResponse updateTicket(
+            @PathVariable Long ticketId,
+            @Valid @RequestBody UpdateTicketRequest request,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return ticketService.updateTicket(
+                ticketId,
+                request,
                 email
         );
     }

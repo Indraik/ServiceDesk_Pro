@@ -221,7 +221,7 @@ public class TicketSpecification {
                         )
                 );
             }
-            
+
             // Search
             if (search != null && !search.isBlank()) {
 

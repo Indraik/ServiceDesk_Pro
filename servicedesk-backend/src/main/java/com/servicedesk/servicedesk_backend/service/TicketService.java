@@ -2,6 +2,7 @@ package com.servicedesk.servicedesk_backend.service;
 
 import com.servicedesk.servicedesk_backend.dto.CreateTicketRequest;
 import com.servicedesk.servicedesk_backend.dto.TicketResponse;
+import com.servicedesk.servicedesk_backend.dto.UpdateTicketRequest;
 import com.servicedesk.servicedesk_backend.entity.*;
 import com.servicedesk.servicedesk_backend.exception.InvalidTicketStatusException;
 import com.servicedesk.servicedesk_backend.exception.ResourceNotFoundException;
@@ -296,5 +297,47 @@ public class TicketService {
         Ticket savedTicket = ticketRepository.save(ticket);
 
         return toTicketResponse(savedTicket);
+    }
+
+    public TicketResponse updateTicket(
+            Long ticketId,
+            UpdateTicketRequest request,
+            String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Ticket not found"));
+
+        boolean isAdmin =
+                user.getRole().getName().equals("ADMIN");
+
+        boolean isOwner =
+                ticket.getCreatedBy().getId().equals(user.getId());
+
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException(
+                    "You are not allowed to update this ticket");
+        }
+
+        if (ticket.getStatus() == TicketStatus.CLOSED ||
+                ticket.getStatus() == TicketStatus.CANCELLED) {
+
+            throw new InvalidTicketStatusException(
+                    "Closed or cancelled tickets cannot be updated");
+        }
+
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setPriority(request.getPriority());
+        ticket.setCategory(request.getCategory());
+        ticket.setUpdatedAt(LocalDateTime.now());
+
+        Ticket updatedTicket = ticketRepository.save(ticket);
+
+        return toTicketResponse(updatedTicket);
     }
 }
