@@ -58,12 +58,13 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public TicketResponse getMyTicket(
+    public TicketResponse getTicket(
             @PathVariable Long id,
             Authentication authentication){
+
         String email = authentication.getName();
 
-        return ticketService.getMyTicket(id, email);
+        return ticketService.getTicketById(id, email);
     }
 
     @PutMapping("/{id}/assign")

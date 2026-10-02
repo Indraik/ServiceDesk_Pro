@@ -225,4 +225,28 @@ public class TicketSpecification {
             );
         };
     }
+
+    public static Specification<Ticket> ticketAccessibleBy(
+            String email,
+            String role) {
+
+        return (root, query, criteriaBuilder) -> {
+
+            if ("ADMIN".equals(role)) {
+                return criteriaBuilder.conjunction();
+            }
+
+            if ("AGENT".equals(role)) {
+                return criteriaBuilder.equal(
+                        root.get("assignedTo").get("email"),
+                        email
+                );
+            }
+
+            return criteriaBuilder.equal(
+                    root.get("createdBy").get("email"),
+                    email
+            );
+        };
+    }
 }

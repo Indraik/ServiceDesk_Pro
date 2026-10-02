@@ -137,13 +137,37 @@ public class TicketService {
         return tickets.map(this::toTicketResponse);
     }
 
-    public TicketResponse getMyTicket(
+    public TicketResponse getTicketById(
             Long ticketId,
-            String email){
+            String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        String role = user.getRole().getName();
+
+        Specification<Ticket> specification =
+                TicketSpecification.ticketAccessibleBy(
+                        email,
+                        role
+                );
+
+        Specification<Ticket> ticketSpecification =
+                specification.and(
+                        (root, query, criteriaBuilder) ->
+                                criteriaBuilder.equal(
+                                        root.get("id"),
+                                        ticketId
+                                )
+                );
+
         Ticket ticket = ticketRepository
-                .findByIdAndCreatedByEmail(ticketId, email)
-                .orElseThrow(()->
-                        new ResourceNotFoundException("Ticket not found"));
+                .findOne(ticketSpecification)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Ticket not found"
+                        ));
 
         return toTicketResponse(ticket);
     }
