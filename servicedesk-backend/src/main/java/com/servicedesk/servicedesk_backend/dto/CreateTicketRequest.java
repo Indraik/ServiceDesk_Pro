@@ -1,5 +1,6 @@
 package com.servicedesk.servicedesk_backend.dto;
 
+import com.servicedesk.servicedesk_backend.entity.Category;
 import com.servicedesk.servicedesk_backend.entity.Priority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,17 @@ public class CreateTicketRequest {
 
     @NotNull(message = "Priority is required")
     private Priority priority;
+
+    @NotNull(message = "Category is required")
+    private Category category;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public CreateTicketRequest(){}
 

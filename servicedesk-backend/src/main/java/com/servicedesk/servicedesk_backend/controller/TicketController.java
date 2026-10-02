@@ -4,6 +4,7 @@ import com.servicedesk.servicedesk_backend.dto.AssignTicketRequest;
 import com.servicedesk.servicedesk_backend.dto.CreateTicketRequest;
 import com.servicedesk.servicedesk_backend.dto.TicketResponse;
 import com.servicedesk.servicedesk_backend.dto.UpdateTicketStatusRequest;
+import com.servicedesk.servicedesk_backend.entity.Category;
 import com.servicedesk.servicedesk_backend.entity.Priority;
 import com.servicedesk.servicedesk_backend.entity.Ticket;
 import com.servicedesk.servicedesk_backend.entity.TicketStatus;
@@ -44,6 +45,7 @@ public class TicketController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) TicketStatus status,
             @RequestParam(required = false) Priority priority,
+            @RequestParam(required = false) Category category,
             Pageable pageable) {
 
         String email = authentication.getName();
@@ -53,6 +55,7 @@ public class TicketController {
                 search,
                 status,
                 priority,
+                category,
                 pageable
         );
     }

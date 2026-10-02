@@ -1,5 +1,6 @@
 package com.servicedesk.servicedesk_backend.specification;
 
+import com.servicedesk.servicedesk_backend.entity.Category;
 import com.servicedesk.servicedesk_backend.entity.Priority;
 import com.servicedesk.servicedesk_backend.entity.Ticket;
 import com.servicedesk.servicedesk_backend.entity.TicketStatus;
@@ -15,7 +16,8 @@ public class TicketSpecification {
             String email,
             String search,
             TicketStatus status,
-            Priority priority) {
+            Priority priority,
+            Category category) {
 
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -44,6 +46,15 @@ public class TicketSpecification {
                         criteriaBuilder.equal(
                                 root.get("priority"),
                                 priority
+                        )
+                );
+            }
+
+            if (category != null) {
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("category"),
+                                category
                         )
                 );
             }
@@ -93,7 +104,8 @@ public class TicketSpecification {
             String email,
             String search,
             TicketStatus status,
-            Priority priority) {
+            Priority priority,
+            Category category) {
 
         return (root, query, criteriaBuilder) -> {
 
@@ -123,6 +135,15 @@ public class TicketSpecification {
                         criteriaBuilder.equal(
                                 root.get("priority"),
                                 priority
+                        )
+                );
+            }
+
+            if (category != null) {
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("category"),
+                                category
                         )
                 );
             }
@@ -165,7 +186,8 @@ public class TicketSpecification {
     public static Specification<Ticket> filterAdminTickets(
             String search,
             TicketStatus status,
-            Priority priority) {
+            Priority priority,
+            Category category) {
 
         return (root, query, criteriaBuilder) -> {
 
@@ -191,6 +213,15 @@ public class TicketSpecification {
                 );
             }
 
+            if (category != null) {
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("category"),
+                                category
+                        )
+                );
+            }
+            
             // Search
             if (search != null && !search.isBlank()) {
 

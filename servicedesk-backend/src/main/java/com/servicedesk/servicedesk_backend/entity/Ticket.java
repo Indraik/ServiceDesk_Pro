@@ -26,6 +26,18 @@ public class Ticket {
     @Column(nullable = false)
     private Priority priority;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;

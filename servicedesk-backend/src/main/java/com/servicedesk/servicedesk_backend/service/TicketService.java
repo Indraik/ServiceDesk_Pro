@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
+import com.servicedesk.servicedesk_backend.entity.Category;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,6 +51,7 @@ public class TicketService {
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
+        ticket.setCategory(request.getCategory());
         ticket.setStatus(TicketStatus.OPEN);
         ticket.setCreatedBy(user);
         ticket.setAssignedTo(null);
@@ -77,6 +79,7 @@ public class TicketService {
                 ticket.getDescription(),
                 ticket.getStatus(),
                 ticket.getPriority(),
+                ticket.getCategory(),
                 ticket.getCreatedBy().getId(),
                 ticket.getCreatedBy().getName(),
                 assignedToId,
@@ -91,6 +94,7 @@ public class TicketService {
             String search,
             TicketStatus status,
             Priority priority,
+            Category category,
             Pageable pageable) {
 
         User user = userRepository.findByEmail(email)
@@ -106,7 +110,8 @@ public class TicketService {
             specification = TicketSpecification.filterAdminTickets(
                     search,
                     status,
-                    priority
+                    priority,
+                    category
             );
 
         } else if ("AGENT".equals(role)) {
@@ -115,7 +120,8 @@ public class TicketService {
                     email,
                     search,
                     status,
-                    priority
+                    priority,
+                    category
             );
 
         } else {
@@ -124,7 +130,8 @@ public class TicketService {
                     email,
                     search,
                     status,
-                    priority
+                    priority,
+                    category
             );
         }
 

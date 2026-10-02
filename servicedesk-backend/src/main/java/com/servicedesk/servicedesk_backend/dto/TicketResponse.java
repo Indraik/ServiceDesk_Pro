@@ -1,5 +1,6 @@
 package com.servicedesk.servicedesk_backend.dto;
 
+import com.servicedesk.servicedesk_backend.entity.Category;
 import com.servicedesk.servicedesk_backend.entity.Priority;
 import com.servicedesk.servicedesk_backend.entity.TicketStatus;
 
@@ -12,6 +13,15 @@ public class TicketResponse {
     private String description;
     private TicketStatus status;
     private Priority priority;
+    private Category category;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     private Long createdById;
     private String createdByName;
@@ -28,6 +38,7 @@ public class TicketResponse {
             String description,
             TicketStatus status,
             Priority priority,
+            Category category,
             Long createdById,
             String createdByName,
             Long assignedToId,
@@ -39,6 +50,7 @@ public class TicketResponse {
         this.description = description;
         this.status = status;
         this.priority = priority;
+        this.category = category;
         this.createdById = createdById;
         this.createdByName = createdByName;
         this.assignedToId = assignedToId;
