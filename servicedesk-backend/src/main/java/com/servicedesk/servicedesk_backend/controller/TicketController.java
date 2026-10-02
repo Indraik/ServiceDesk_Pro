@@ -4,9 +4,13 @@ import com.servicedesk.servicedesk_backend.dto.AssignTicketRequest;
 import com.servicedesk.servicedesk_backend.dto.CreateTicketRequest;
 import com.servicedesk.servicedesk_backend.dto.TicketResponse;
 import com.servicedesk.servicedesk_backend.dto.UpdateTicketStatusRequest;
+import com.servicedesk.servicedesk_backend.entity.Priority;
 import com.servicedesk.servicedesk_backend.entity.Ticket;
+import com.servicedesk.servicedesk_backend.entity.TicketStatus;
 import com.servicedesk.servicedesk_backend.service.TicketService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -35,10 +39,14 @@ public class TicketController {
     }
 
     @GetMapping
-    public List<TicketResponse> getMyTickets(Authentication authentication){
+    public Page<TicketResponse> getMyTickets(
+            Authentication authentication,
+            @RequestParam(required = false) TicketStatus status,
+            @RequestParam(required = false) Priority priority,
+            Pageable pageable){
         String email = authentication.getName();
 
-        return ticketService.getMyTickets(email);
+        return ticketService.getMyTickets(email,status, priority, pageable);
     }
 
     @GetMapping("/{id}")

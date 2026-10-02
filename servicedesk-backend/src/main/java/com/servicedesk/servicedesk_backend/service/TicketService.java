@@ -9,6 +9,8 @@ import com.servicedesk.servicedesk_backend.repository.TicketAssignmentHistoryRep
 import com.servicedesk.servicedesk_backend.repository.TicketRepository;
 import com.servicedesk.servicedesk_backend.repository.TicketStatusHistoryRepository;
 import com.servicedesk.servicedesk_backend.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -82,12 +84,55 @@ public class TicketService {
         );
     }
 
-    public List<TicketResponse> getMyTickets(String email){
-        List<Ticket> tickets = ticketRepository.findByCreatedByEmail(email);
+//    public List<TicketResponse> getMyTickets(String email){
+//        List<Ticket> tickets = ticketRepository.findByCreatedByEmail(email);
+//
+//        return tickets.stream()
+//                .map(this::toTicketResponse)
+//                .toList();
+//    }
+//    public Page<TicketResponse> getMyTickets(String email, Pageable pageable){
+//        Page<Ticket> tickets = ticketRepository.findByCreatedByEmail(
+//                email,
+//                pageable
+//        );
+//        return tickets.map(this::toTicketResponse);
+//    }
+    public Page<TicketResponse> getMyTickets(
+            String email,
+            TicketStatus status,
+            Priority priority,
+            Pageable pageable) {
 
-        return tickets.stream()
-                .map(this::toTicketResponse)
-                .toList();
+        Page<Ticket> tickets;
+
+        if (status != null && priority != null) {
+            tickets = ticketRepository.findByCreatedByEmailAndStatusAndPriority(
+                    email,
+                    status,
+                    priority,
+                    pageable
+            );
+        }else if (status != null) {
+            tickets = ticketRepository.findByCreatedByEmailAndStatus(
+                    email,
+                    status,
+                    pageable
+            );
+        } else if (priority != null) {
+            tickets = ticketRepository.findByCreatedByEmailAndPriority(
+                    email,
+                    priority,
+                    pageable
+            );
+        } else {
+            tickets = ticketRepository.findByCreatedByEmail(
+                    email,
+                    pageable
+            );
+        }
+
+        return tickets.map(this::toTicketResponse);
     }
 
     public TicketResponse getMyTicket(
