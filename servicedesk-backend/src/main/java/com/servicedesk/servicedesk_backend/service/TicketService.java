@@ -93,13 +93,40 @@ public class TicketService {
             Priority priority,
             Pageable pageable) {
 
-        Specification<Ticket> specification =
-                TicketSpecification.filterTickets(
-                        email,
-                        search,
-                        status,
-                        priority
-                );
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        String role = user.getRole().getName();
+
+        Specification<Ticket> specification;
+
+        if("ADMIN".equals(role)){
+
+            specification = TicketSpecification.filterAdminTickets(
+                    search,
+                    status,
+                    priority
+            );
+
+        } else if ("AGENT".equals(role)) {
+
+            specification = TicketSpecification.filterAgentTickets(
+                    email,
+                    search,
+                    status,
+                    priority
+            );
+
+        } else {
+
+            specification = TicketSpecification.filterTickets(
+                    email,
+                    search,
+                    status,
+                    priority
+            );
+        }
 
         Page<Ticket> tickets =
                 ticketRepository.findAll(
