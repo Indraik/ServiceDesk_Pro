@@ -68,3 +68,4 @@ export const assignTicket = async (ticketId, agentId) => {
 
     return response.data;
 };
+

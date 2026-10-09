@@ -1,13 +1,14 @@
 
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { addTicketComment } from "../../services/ticketService";
-
 import {
+    addTicketComment,
+    updateTicketStatus,
     getTicketById,
     getTicketActivity,
     getTicketComments
 } from "../../services/ticketService";
+
 
 function TicketDetails() {
     const { ticketId } = useParams();
@@ -63,6 +64,47 @@ function TicketDetails() {
             active = false;
         };
     }, [ticketId]);
+
+
+    const [closing, setClosing] = useState(false);
+    const [statusMessage, setStatusMessage] = useState("");
+    const [statusError, setStatusError] = useState("");
+
+    const handleCloseTicket = async () => {
+        const confirmed = window.confirm(
+            "Are you sure you want to close this resolved ticket?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+            setClosing(true);
+            setStatusMessage("");
+            setStatusError("");
+
+            await updateTicketStatus(ticketId, "CLOSED");
+
+            const [updatedTicket, updatedActivity, updatedComments] =
+                await Promise.all([
+                    getTicketById(ticketId),
+                    getTicketActivity(ticketId),
+                    getTicketComments(ticketId)
+                ]);
+
+            setTicket(updatedTicket);
+            setActivity(Array.isArray(updatedActivity) ? updatedActivity : []);
+            setComments(Array.isArray(updatedComments) ? updatedComments : []);
+
+            setStatusMessage("Ticket closed successfully.");
+        } catch (err) {
+            setStatusError(
+                err.response?.data?.message ||
+                "Unable to close the ticket."
+            );
+        } finally {
+            setClosing(false);
+        }
+    };
 
     const handleAddComment = async (event) => {
         event.preventDefault();
@@ -130,6 +172,24 @@ function TicketDetails() {
                     <span>{ticket.priority}</span>
                     <span>{ticket.category}</span>
                 </div>
+
+                {statusMessage && (
+                    <p className="success-message">{statusMessage}</p>
+                )}
+
+                {statusError && (
+                    <p className="error-message">{statusError}</p>
+                )}
+
+                {ticket.status === "RESOLVED" && (
+                    <button
+                        type="button"
+                        onClick={handleCloseTicket}
+                        disabled={closing}
+                    >
+                        {closing ? "Closing..." : "Close Ticket"}
+                    </button>
+                )}
 
                 <h2>Description</h2>
                 <p className="ticket-description">{ticket.description}</p>
