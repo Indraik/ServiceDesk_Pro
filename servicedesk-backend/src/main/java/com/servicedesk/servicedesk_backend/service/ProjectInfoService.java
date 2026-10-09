@@ -23,7 +23,8 @@ public class ProjectInfoService {
         return new UserResponse(
                 Saveduser.getId(),
                 Saveduser.getName(),
-                Saveduser.getEmail()
+                Saveduser.getEmail(),
+                Saveduser.getRole().getName()
         );
     }
     public ProjectInfoResponse getProjectInfo(){
