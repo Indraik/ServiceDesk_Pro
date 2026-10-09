@@ -15,6 +15,8 @@ import MyTickets from "./pages/customer/MyTickets";
 import TicketDetails from "./pages/customer/TicketDetails";
 import AgentTickets from "./pages/agent/AgentTickets";
 import AgentTicketDetails from "./pages/agent/AgentTicketDetails";
+import AdminTickets from "./pages/admin/AdminTickets";
+import AdminTicketDetails from "./pages/admin/AdminTicketDetails";
 
 function App() {
   return (
@@ -100,6 +102,25 @@ function App() {
             </RoleRoute>
           }
         />
+
+        <Route
+          path="/admin/tickets"
+          element={
+            <RoleRoute allowedRoles={["ADMIN"]}>
+              <AdminTickets />
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/admin/tickets/:ticketId"
+          element={
+            <RoleRoute allowedRoles={["ADMIN"]}>
+              <AdminTicketDetails />
+            </RoleRoute>
+          }
+        />
+
 
       </Routes>
 

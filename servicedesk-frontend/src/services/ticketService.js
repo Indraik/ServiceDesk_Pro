@@ -53,3 +53,18 @@ export const updateTicketStatus = async (ticketId, status) => {
 
     return response.data;
 };
+
+
+export const getAgents = async () => {
+    const response = await api.get("/users/agents");
+    return response.data;
+};
+
+export const assignTicket = async (ticketId, agentId) => {
+    const response = await api.put(
+        `/tickets/${ticketId}/assign`,
+        { agentId: Number(agentId) }
+    );
+
+    return response.data;
+};
