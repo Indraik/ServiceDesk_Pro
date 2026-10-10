@@ -224,6 +224,7 @@ public class TicketService {
         return toTicketResponse(savedTicket);
     }
 
+    @Transactional
     public TicketResponse updateStatus(
             Long ticketId,
             TicketStatus newStatus,
