@@ -6,6 +6,7 @@ import com.servicedesk.servicedesk_backend.dto.UpdateTicketRequest;
 import com.servicedesk.servicedesk_backend.entity.*;
 import com.servicedesk.servicedesk_backend.exception.InvalidTicketStatusException;
 import com.servicedesk.servicedesk_backend.exception.ResourceNotFoundException;
+import com.servicedesk.servicedesk_backend.exception.TicketConflictException;
 import com.servicedesk.servicedesk_backend.repository.TicketAssignmentHistoryRepository;
 import com.servicedesk.servicedesk_backend.repository.TicketRepository;
 import com.servicedesk.servicedesk_backend.repository.TicketStatusHistoryRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 import com.servicedesk.servicedesk_backend.entity.Category;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -180,6 +182,7 @@ public class TicketService {
         return toTicketResponse(ticket);
     }
 
+    @Transactional
     public TicketResponse assignTicket(
             Long ticketId,
             Long agentId,
@@ -198,7 +201,7 @@ public class TicketService {
                         new ResourceNotFoundException("Agent not found"));
 
         if(ticket.getStatus() != TicketStatus.OPEN){
-            throw new IllegalStateException("Only OPEN tickets can be assigned");
+            throw new TicketConflictException("Only OPEN tickets can be assigned");
 
         }
 

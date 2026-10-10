@@ -113,4 +113,24 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(response);
     }
+
+
+    @ExceptionHandler(TicketConflictException.class)
+    public ResponseEntity<ErrorResponse> handleTicketConflict(
+            TicketConflictException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(response);
+    }
+
 }

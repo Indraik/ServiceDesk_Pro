@@ -14,6 +14,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.http.HttpMethod;
+import tools.jackson.databind.ObjectMapper;
+import com.servicedesk.servicedesk_backend.dto.ErrorResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -22,18 +26,55 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            ObjectMapper objectMapper) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {})
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
-                        ))
+                        )
+                )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, ex) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+
+                            ErrorResponse error = new ErrorResponse(
+                                    LocalDateTime.now(),
+                                    401,
+                                    "Unauthorized",
+                                    "Authentication is required or the token is invalid",
+                                    request.getRequestURI()
+                            );
+
+                            objectMapper.writeValue(
+                                    response.getOutputStream(), error
+                            );
+                        })
+                        .accessDeniedHandler((request, response, ex) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+
+                            ErrorResponse error = new ErrorResponse(
+                                    LocalDateTime.now(),
+                                    403,
+                                    "Forbidden",
+                                    "You do not have permission to access this resource",
+                                    request.getRequestURI()
+                            );
+
+                            objectMapper.writeValue(
+                                    response.getOutputStream(), error
+                            );
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
@@ -47,6 +88,7 @@ public class SecurityConfig {
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
+
         return http.build();
     }
 
