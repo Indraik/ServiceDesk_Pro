@@ -113,12 +113,17 @@ public class CommentService {
     }
 
     private CommentResponse toCommentResponse(Comment comment) {
+        String roleName = null;
+        if (comment.getCreatedBy() != null && comment.getCreatedBy().getRole() != null) {
+            roleName = comment.getCreatedBy().getRole().getName();
+        }
 
         return new CommentResponse(
                 comment.getId(),
                 comment.getContent(),
-                comment.getCreatedBy().getId(),
-                comment.getCreatedBy().getName(),
+                comment.getCreatedBy() != null ? comment.getCreatedBy().getId() : null,
+                comment.getCreatedBy() != null ? comment.getCreatedBy().getName() : "Unknown User",
+                roleName,
                 comment.getCreatedAt()
         );
     }
