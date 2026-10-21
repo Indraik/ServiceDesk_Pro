@@ -19,6 +19,15 @@ public class UserResponse {
         this.role = role;
     }
 
+    public static UserResponse from(com.servicedesk.servicedesk_backend.entity.User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole() != null ? user.getRole().getName() : null
+        );
+    }
+
     public Long getId() {
         return id;
     }

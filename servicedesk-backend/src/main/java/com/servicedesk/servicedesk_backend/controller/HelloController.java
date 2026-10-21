@@ -23,10 +23,6 @@ public class HelloController {
     public ProjectInfoResponse info(){
         return projectInfoService.getProjectInfo();
     }
-    @PostMapping("/api/test-user")
-    public UserResponse createTestUser(){
-        return projectInfoService.createTestUser();
-    }
 
 
 }

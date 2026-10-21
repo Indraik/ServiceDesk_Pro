@@ -48,4 +48,8 @@ public class RegisterRequest {
         this.password = password;
     }
 
+    public void setRole(String role) {
+        // Ignored: Default registration is strictly enforced as CUSTOMER on the backend
+    }
+
 }

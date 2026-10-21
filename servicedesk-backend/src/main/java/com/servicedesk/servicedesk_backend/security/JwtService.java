@@ -48,6 +48,9 @@ public class JwtService {
 
     public boolean isTokenValid(String token, String email) {
         String extractedEmail = extractUsername(token);
-        return extractedEmail.equals(email);
+
+        return extractedEmail != null
+                && extractedEmail.equals(email);
     }
+
 }

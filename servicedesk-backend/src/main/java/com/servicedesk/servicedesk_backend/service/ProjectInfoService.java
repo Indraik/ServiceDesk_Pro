@@ -13,20 +13,6 @@ public class ProjectInfoService {
         this.userRepository = userRepository;
     }
 
-    public UserResponse createTestUser(){
-        User user = new User(
-                "Test User",
-                "test2@servicedesk.com",
-                "test@123"
-        );
-        User Saveduser = userRepository.save(user);
-        return new UserResponse(
-                Saveduser.getId(),
-                Saveduser.getName(),
-                Saveduser.getEmail(),
-                Saveduser.getRole().getName()
-        );
-    }
     public ProjectInfoResponse getProjectInfo(){
         return new ProjectInfoResponse(
                 "ServiceDesk Pro",
