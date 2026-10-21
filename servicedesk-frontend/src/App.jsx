@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -10,120 +11,129 @@ import RoleRoute from "./components/common/RoleRoute";
 import CustomerDashboard from "./pages/customer/CustomerDashboard";
 import AgentDashboard from "./pages/agent/AgentDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+
 import CreateTicket from "./pages/customer/CreateTicket";
 import MyTickets from "./pages/customer/MyTickets";
 import TicketDetails from "./pages/customer/TicketDetails";
+
 import AgentTickets from "./pages/agent/AgentTickets";
 import AgentTicketDetails from "./pages/agent/AgentTicketDetails";
+
 import AdminTickets from "./pages/admin/AdminTickets";
 import AdminTicketDetails from "./pages/admin/AdminTicketDetails";
+import UserManagement from "./pages/admin/UserManagement";
 
 function App() {
   return (
     <BrowserRouter>
+      <Navbar>
+        <Routes>
+          <Route path="/" element={<Home />} />
 
-      <Navbar />
+          <Route path="/login" element={<Login />} />
 
-      <Routes>
+          <Route path="/register" element={<Register />} />
 
-        <Route path="/" element={<Home />} />
+          <Route
+            path="/customer/dashboard"
+            element={
+              <RoleRoute allowedRoles={["CUSTOMER"]}>
+                <CustomerDashboard />
+              </RoleRoute>
+            }
+          />
 
-        <Route path="/login" element={<Login />} />
+          <Route
+            path="/customer/tickets/new"
+            element={
+              <RoleRoute allowedRoles={["CUSTOMER"]}>
+                <CreateTicket />
+              </RoleRoute>
+            }
+          />
 
-        <Route path="/register" element={<Register />} />
+          <Route
+            path="/customer/tickets"
+            element={
+              <RoleRoute allowedRoles={["CUSTOMER"]}>
+                <MyTickets />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/customer/dashboard"
-          element={
-            <RoleRoute allowedRoles={["CUSTOMER"]}>
-              <CustomerDashboard />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/customer/tickets/:ticketId"
+            element={
+              <RoleRoute allowedRoles={["CUSTOMER"]}>
+                <TicketDetails />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/agent/dashboard"
-          element={
-            <RoleRoute allowedRoles={["AGENT"]}>
-              <AgentDashboard />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/agent/dashboard"
+            element={
+              <RoleRoute allowedRoles={["AGENT"]}>
+                <AgentDashboard />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/admin/dashboard"
-          element={
-            <RoleRoute allowedRoles={["ADMIN"]}>
-              <AdminDashboard />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/agent/tickets"
+            element={
+              <RoleRoute allowedRoles={["AGENT"]}>
+                <AgentTickets />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/customer/tickets/new"
-          element={
-            <RoleRoute allowedRoles={["CUSTOMER"]}>
-              <CreateTicket />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/agent/tickets/:ticketId"
+            element={
+              <RoleRoute allowedRoles={["AGENT"]}>
+                <AgentTicketDetails />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/customer/tickets"
-          element={
-            <RoleRoute allowedRoles={["CUSTOMER"]}>
-              <MyTickets />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <RoleRoute allowedRoles={["ADMIN"]}>
+                <AdminDashboard />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/customer/tickets/:ticketId"
-          element={
-            <RoleRoute allowedRoles={["CUSTOMER"]}>
-              <TicketDetails />
-            </RoleRoute>
-          }
-        />
-        <Route
-          path="/agent/tickets"
-          element={
-            <RoleRoute allowedRoles={["AGENT"]}>
-              <AgentTickets />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/admin/tickets"
+            element={
+              <RoleRoute allowedRoles={["ADMIN"]}>
+                <AdminTickets />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/agent/tickets/:ticketId"
-          element={
-            <RoleRoute allowedRoles={["AGENT"]}>
-              <AgentTicketDetails />
-            </RoleRoute>
-          }
-        />
+          <Route
+            path="/admin/tickets/:ticketId"
+            element={
+              <RoleRoute allowedRoles={["ADMIN"]}>
+                <AdminTicketDetails />
+              </RoleRoute>
+            }
+          />
 
-        <Route
-          path="/admin/tickets"
-          element={
-            <RoleRoute allowedRoles={["ADMIN"]}>
-              <AdminTickets />
-            </RoleRoute>
-          }
-        />
-
-        <Route
-          path="/admin/tickets/:ticketId"
-          element={
-            <RoleRoute allowedRoles={["ADMIN"]}>
-              <AdminTicketDetails />
-            </RoleRoute>
-          }
-        />
-
-
-      </Routes>
-
+          <Route
+            path="/admin/users"
+            element={
+              <RoleRoute allowedRoles={["ADMIN"]}>
+                <UserManagement />
+              </RoleRoute>
+            }
+          />
+        </Routes>
+      </Navbar>
     </BrowserRouter>
   );
 }
