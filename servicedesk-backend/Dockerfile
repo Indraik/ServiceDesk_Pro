@@ -2,9 +2,9 @@ FROM eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /app
 
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
-COPY src/ src/
+COPY servicedesk-backend/.mvn/ .mvn/
+COPY servicedesk-backend/mvnw servicedesk-backend/pom.xml ./
+COPY servicedesk-backend/src/ src/
 
 RUN chmod +x mvnw && ./mvnw -DskipTests package && \
     find target -maxdepth 1 -type f -name '*.jar' \
