@@ -1,691 +1,247 @@
-# 🛠️ ServiceDesk Pro
+# ServiceDesk Pro — Enterprise Service & Support Management Platform
 
-**ServiceDesk Pro** is an enterprise-style **IT Service Desk and Support Management System** designed to manage customer support tickets, users, agents, roles, ticket assignments, comments, status transitions, and ticket history.
+A full-stack IT service management application for creating, assigning, tracking, and resolving support tickets through role-based workflows.
 
-The application is built using **Java Spring Boot** with a layered architecture following industry-standard backend development practices.
+**Live application:** https://servicedesk-frontend.vercel.app  
+**Backend API:** https://servicedesk-backend-7v17.onrender.com  
+**GitHub repository:** https://github.com/Indraik/ServiceDesk_Pro
 
----
+## Overview
 
-## 📌 Project Overview
+IT support teams need a structured way to manage service requests, assign work to engineers, track progress, and maintain accountability. ServiceDesk Pro provides a centralized ticket management platform with separate experiences for customers, agents, and administrators.
 
-ServiceDesk Pro provides a centralized platform for organizations to manage IT support requests.
+The application combines a React frontend, a Spring Boot REST API, JWT-based authentication, role-based authorization, and a PostgreSQL database.
 
-Customers can raise support tickets and track their progress, while administrators and support agents can manage, assign, update, and resolve tickets through a controlled ticket lifecycle.
+## Features
 
-The project demonstrates practical implementation of:
+### Customer
+- Register and sign in securely.
+- Create support tickets with descriptions, categories, and priorities.
+- View personal tickets and their progress.
+- Add comments and review ticket updates.
+- Verify completed resolutions and close tickets where permitted.
 
-* RESTful APIs
-* Object-Oriented Programming
-* Spring Boot
-* Spring Data JPA
-* Hibernate ORM
-* PostgreSQL
-* Spring Security
-* JWT Authentication
-* Role-Based Access Control
-* Layered Architecture
-* Database Relationships
-* Validation
-* Exception Handling
-* Git & GitHub
+### Agent
+- View assigned support tickets.
+- Work on tickets through the supported status workflow.
+- Add comments and update ticket progress.
 
----
+### Administrator
+- View and manage support tickets.
+- Assign tickets to agents.
+- Manage user roles.
+- Review ticket status and assignment history.
+- Access administrative ticket management features.
 
-## 🚀 Key Features
+### Ticket management
+- Ticket status and priority management.
+- Search, filtering, sorting, and pagination.
+- Ticket comments and activity history.
+- Validation and structured API error responses.
 
-### 👤 User Management
+## Technology Stack
 
-* User registration
-* User login
-* User roles
-* Customer and Admin/Agent access
-* Role-based authorization
-* Secure password handling
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, JavaScript, Axios |
+| Backend | Java, Spring Boot, Spring Security |
+| API | REST |
+| Authentication | JWT, BCrypt password hashing |
+| Persistence | Spring Data JPA, Hibernate |
+| Database | PostgreSQL |
+| Database migrations | Flyway |
+| Testing | Maven, JUnit-based tests |
+| Deployment | Vercel, Render, Neon |
+| Tools | Git, GitHub, Postman |
 
-### 🎫 Ticket Management
-
-* Create support tickets
-* View tickets
-* Update ticket details
-* Assign tickets to agents
-* Track ticket status
-* Resolve tickets
-* Close resolved tickets
-* Ticket lifecycle management
-
-### 🔄 Ticket Status Lifecycle
-
-Tickets follow a controlled workflow:
-
-```text
-OPEN
-  ↓
-ASSIGNED
-  ↓
-IN_PROGRESS
-  ↓
-RESOLVED
-  ↓
-CLOSED
-```
-
-The system controls which users can perform specific status transitions.
-
-### 💬 Comments
-
-Users and support staff can add comments to tickets.
-
-Comments provide communication between customers and support agents while maintaining the ticket's discussion history.
-
-### 📜 Status History
-
-Every important status transition can be recorded as history.
-
-Example:
+## Architecture
 
 ```text
-OPEN → IN_PROGRESS
-IN_PROGRESS → RESOLVED
-RESOLVED → CLOSED
+Customer / Agent / Admin
+          |
+          v
+   React + Vite Frontend
+          |
+       HTTPS / REST
+          |
+          v
+   Spring Boot Backend
+          |
+     Spring Security
+          |
+    JWT Authentication
+          |
+     Controller Layer
+          |
+      Service Layer
+          |
+    Repository Layer
+          |
+     JPA / Hibernate
+          |
+          v
+     Neon PostgreSQL
 ```
 
-This provides traceability for ticket activities.
+The frontend communicates with the backend through REST endpoints. The backend validates requests, authenticates users, enforces access rules, applies business logic, and persists data in PostgreSQL.
 
-### 🔐 Authentication & Authorization
+## Ticket Lifecycle
 
-The backend uses Spring Security to protect application resources.
+The supported ticket statuses are:
 
-Authentication verifies the user's identity, while authorization determines what actions the user is allowed to perform.
+`OPEN → ASSIGNED → IN_PROGRESS → RESOLVED → CLOSED`
 
-Example:
+The application also supports `CANCELLED` for applicable cancellation flows. Valid transitions are enforced by the backend rather than relying only on frontend controls.
 
-```text
-Customer
-   ↓
-Create / View Own Tickets
-   ↓
-Add Comments
+## Security
 
-Agent
-   ↓
-View / Manage Assigned Tickets
-   ↓
-Update Ticket Status
-   ↓
-Resolve Tickets
+- Passwords are stored using BCrypt hashing.
+- JWTs authenticate protected API requests.
+- Role-based access control distinguishes CUSTOMER, AGENT, and ADMIN.
+- Registration assigns the CUSTOMER role by default.
+- Administrative role changes are protected by backend authorization and safeguards.
+- Production credentials and JWT secrets are supplied through environment variables.
+- CORS is configured for the deployed frontend origin.
+- Flyway manages the production database schema.
 
-Admin
-   ↓
-Manage Users
-   ↓
-Manage Tickets
-   ↓
-Assign Agents
-   ↓
-Administrative Operations
-```
+## Database
 
----
+The application uses PostgreSQL and includes tables for the principal entities:
 
-# 🏗️ Architecture
+- `users` and `roles`
+- `tickets`
+- `comments`
+- `ticket_status_history`
+- `ticket_assignment_history`
+- `flyway_schema_history` for migration tracking
 
-ServiceDesk Pro follows a layered architecture:
+Flyway validates and applies versioned schema migrations in the production environment.
 
-```text
-                Client / Frontend
-                       │
-                       ▼
-                REST Controller
-                       │
-                       ▼
-                    Service
-                       │
-                       ▼
-                   Repository
-                       │
-                       ▼
-                  JPA / Hibernate
-                       │
-                       ▼
-                   PostgreSQL
-```
+## API
 
-### Controller Layer
+The backend exposes REST endpoints under `/api`.
 
-Handles HTTP requests and responses.
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/api/auth/register` | POST | Register a customer account |
+| `/api/auth/login` | POST | Authenticate and receive a JWT |
+| `/api/users/agents` | GET | Retrieve the agent list, subject to authorization |
+| `/api/tickets` | Various | Ticket operations, subject to the implemented routes and permissions |
 
-Example:
+Protected endpoints require a valid JWT in the `Authorization: Bearer <token>` header. Refer to the controllers in the repository for the complete endpoint list, request schemas, and access requirements.
 
-```text
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/tickets
-POST /api/tickets
-PUT  /api/tickets/{id}
-```
+## Local Development
 
-### Service Layer
+### Prerequisites
 
-Contains the application's business logic.
+- JDK 21 or compatible configured Java environment
+- Node.js and npm
+- PostgreSQL
+- Git
 
-Examples:
-
-* Ticket status validation
-* Role-based operations
-* Ticket assignment
-* User registration
-* Comment handling
-
-### Repository Layer
-
-Communicates with the database using Spring Data JPA.
-
-Example:
-
-```java
-public interface UserRepository extends JpaRepository<User, Long> {
-}
-```
-
-### Entity Layer
-
-Represents database tables as Java objects.
-
-Examples:
-
-```text
-User
-Role
-Ticket
-Comment
-StatusHistory
-```
-
----
-
-# 🧰 Technology Stack
-
-| Technology      | Purpose                        |
-| --------------- | ------------------------------ |
-| Java 21         | Programming language           |
-| Spring Boot     | Backend framework              |
-| Spring Web      | REST API development           |
-| Spring Data JPA | Database persistence           |
-| Hibernate       | ORM                            |
-| Spring Security | Authentication & authorization |
-| PostgreSQL      | Relational database            |
-| Maven           | Dependency & build management  |
-| Lombok          | Boilerplate reduction          |
-| Git             | Version control                |
-| GitHub          | Source code management         |
-| Postman         | API testing                    |
-
----
-
-# 🗄️ Database
-
-ServiceDesk Pro uses **PostgreSQL** as its relational database.
-
-The application uses JPA/Hibernate to map Java entities to database tables.
-
-Basic relationship:
-
-```text
-Role
- │
- │ 1
- │
- │
- ▼
-User
- │
- │
- ├───────────────┐
- │               │
- ▼               ▼
-Ticket         Comment
- │
- │
- ▼
-Status History
-```
-
-### Example User–Role Relationship
-
-A user belongs to a role.
-
-```java
-@ManyToOne
-@JoinColumn(name = "role_id")
-private Role role;
-```
-
-This creates a relationship between the `users` and `roles` tables.
-
----
-
-# 📁 Project Structure
-
-```text
-ServiceDesk_Pro/
-│
-├── servicedesk-backend/
-│   │
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── com/
-│   │   │   │       └── servicedesk/
-│   │   │   │           └── servicedesk_backend/
-│   │   │   │
-│   │   │   │               ├── controller/
-│   │   │   │               ├── service/
-│   │   │   │               ├── repository/
-│   │   │   │               ├── entity/
-│   │   │   │               ├── security/
-│   │   │   │               └── ...
-│   │   │   │
-│   │   │   └── resources/
-│   │   │       └── application.properties
-│   │   │
-│   │   └── test/
-│   │
-│   ├── pom.xml
-│   └── ...
-│
-├── .gitignore
-└── README.md
-```
-
----
-
-# ⚙️ Getting Started
-
-## Prerequisites
-
-Make sure the following are installed:
-
-* Java JDK 21+
-* Maven
-* PostgreSQL
-* Git
-* Postman (recommended)
-
-Verify Java:
-
-```bash
-java -version
-```
-
-Verify Maven:
-
-```bash
-mvn -version
-```
-
----
-
-## 📥 Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Indraik/ServiceDesk_Pro.git
+cd ServiceDesk_Pro
 ```
 
-Move into the backend project:
+### 2. Configure the backend
+
+Set the required environment variables before starting the backend:
+
+```text
+DB_URL=jdbc:postgresql://localhost:5432/servicedesk_db
+DB_USERNAME=your_local_database_username
+DB_PASSWORD=your_local_database_password
+JWT_SECRET=your_generated_jwt_secret
+JWT_EXPIRATION=3600000
+APP_CORS_ALLOWED_ORIGIN=http://localhost:5173
+```
+
+Use a local development database and locally generated secrets. Never commit real credentials.
+
+### 3. Run the backend
+
+From the `servicedesk-backend` directory:
 
 ```bash
-cd ServiceDesk_Pro/servicedesk-backend
+./mvnw spring-boot:run
 ```
 
----
+On Windows PowerShell, use:
 
-# 🗃️ Database Setup
-
-Create a PostgreSQL database:
-
-```sql
-CREATE DATABASE servicedesk_db;
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
-Configure the database in:
+### 4. Run the frontend
 
-```text
-src/main/resources/application.properties
-```
-
-Example:
-
-```properties
-spring.application.name=servicedesk-backend
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/servicedesk_db
-spring.datasource.username=postgres
-spring.datasource.password=YOUR_PASSWORD
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-```
-
-Replace:
-
-```text
-YOUR_PASSWORD
-```
-
-with your PostgreSQL password.
-
----
-
-# ▶️ Running the Application
-
-Using Maven:
+From the `servicedesk-frontend` directory:
 
 ```bash
-mvn spring-boot:run
+npm install
+npm run dev
 ```
 
-Or run the main Spring Boot application class from your IDE.
-
-The backend will start on:
+Configure `VITE_API_BASE_URL` in the frontend environment to point to the local API:
 
 ```text
-http://localhost:8080
+VITE_API_BASE_URL=http://localhost:8080/api
 ```
 
----
+### 5. Run tests and build
 
-# 🔌 API Structure
+Backend tests:
 
-The application follows RESTful API principles.
-
-Typical API structure:
-
-```text
-/api/auth
-/api/users
-/api/tickets
-/api/comments
+```powershell
+cd servicedesk-backend
+.\mvnw.cmd clean test
 ```
 
-### Authentication
+Frontend production build:
 
-```text
-POST /api/auth/register
-POST /api/auth/login
+```powershell
+cd servicedesk-frontend
+npm run build
 ```
 
-### Tickets
+## Production Deployment
 
-```text
-GET    /api/tickets
-GET    /api/tickets/{id}
-POST   /api/tickets
-PUT    /api/tickets/{id}
-DELETE /api/tickets/{id}
-```
+| Component | Platform |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render |
+| PostgreSQL database | Neon |
 
-### Comments
+The production backend uses the `prod` Spring profile and Flyway-managed schema migrations. Configure database credentials, JWT secrets, and allowed frontend origins in the hosting platform's environment settings.
 
-```text
-POST /api/tickets/{id}/comments
-GET  /api/tickets/{id}/comments
-```
+The frontend uses `VITE_API_BASE_URL` to select the API endpoint. Redeploy the frontend after changing build-time environment variables.
 
-> Endpoint availability depends on the current implementation of the corresponding controller.
+## Verification
 
----
+The deployment workflow has been verified for:
 
-# 🔐 Security
+- Backend automated tests: 13 tests passed with zero failures or errors.
+- Frontend production build: completed successfully.
+- Production database connection and Flyway schema validation.
+- Customer registration with the default CUSTOMER role.
+- Login and JWT issuance.
+- Role-based denial of an unauthorized customer request.
 
-Security is implemented using **Spring Security**.
+These checks establish a baseline; they do not replace comprehensive security, load, and end-to-end testing.
 
-The application separates:
+## Future Improvements
 
-### Authentication
+- Expand automated authorization and integration tests.
+- Add monitoring, structured logging, and operational alerts.
+- Improve API documentation and request examples.
+- Add comprehensive end-to-end regression testing.
+- Review production backup, recovery, and availability requirements.
 
-Determines:
+## Author
 
-> "Who are you?"
+**V. Indra Kumar**  
+Computer Science and Engineering — Cyber Security
 
-### Authorization
-
-Determines:
-
-> "What are you allowed to do?"
-
-Role-based access can be represented as:
-
-```text
-ROLE_ADMIN
-ROLE_AGENT
-ROLE_CUSTOMER
-```
-
-This prevents unauthorized users from performing restricted operations.
-
----
-
-# 🧩 Core Spring Concepts Used
-
-The project demonstrates several important Spring concepts.
-
-### Dependency Injection
-
-Dependencies are injected through constructors instead of manually creating objects.
-
-```java
-public TicketController(TicketService ticketService) {
-    this.ticketService = ticketService;
-}
-```
-
-### REST Controller
-
-```java
-@RestController
-@RequestMapping("/api/tickets")
-```
-
-### Service Layer
-
-```java
-@Service
-```
-
-### Repository
-
-```java
-@Repository
-```
-
-or Spring Data JPA repository interfaces.
-
-### Entity Mapping
-
-```java
-@Entity
-@Table(name = "users")
-```
-
-### Relationships
-
-```java
-@ManyToOne
-@JoinColumn(name = "role_id")
-```
-
----
-
-# 🧪 Testing
-
-API endpoints can be tested using **Postman**.
-
-Example workflow:
-
-```text
-Register User
-      ↓
-Login
-      ↓
-Receive Authentication Token
-      ↓
-Send Token in Request
-      ↓
-Create Ticket
-      ↓
-Assign Ticket
-      ↓
-Update Status
-      ↓
-Add Comment
-      ↓
-Resolve Ticket
-      ↓
-Close Ticket
-```
-
----
-
-# 📊 Ticket Lifecycle
-
-The ticket lifecycle is one of the core parts of ServiceDesk Pro.
-
-```text
-              ┌─────────────┐
-              │    OPEN     │
-              └──────┬──────┘
-                     │
-                     ▼
-              ┌─────────────┐
-              │  ASSIGNED   │
-              └──────┬──────┘
-                     │
-                     ▼
-              ┌─────────────┐
-              │ IN_PROGRESS │
-              └──────┬──────┘
-                     │
-                     ▼
-              ┌─────────────┐
-              │  RESOLVED   │
-              └──────┬──────┘
-                     │
-                     ▼
-              ┌─────────────┐
-              │   CLOSED    │
-              └─────────────┘
-```
-
-Status transitions are validated according to the application's business rules and user roles.
-
----
-
-# 🎯 Project Objectives
-
-The primary objectives of ServiceDesk Pro are:
-
-* Build a real-world enterprise backend
-* Implement RESTful API architecture
-* Understand Spring Boot development
-* Implement database relationships using JPA/Hibernate
-* Implement authentication and authorization
-* Apply role-based access control
-* Implement ticket lifecycle management
-* Maintain ticket activity history
-* Follow layered architecture
-* Practice clean backend development
-* Gain experience with PostgreSQL and Git
-
----
-
-# 📚 Concepts Demonstrated
-
-This project provides practical exposure to:
-
-```text
-Java
- │
- ├── OOP
- │   ├── Encapsulation
- │   ├── Inheritance
- │   ├── Polymorphism
- │   └── Abstraction
- │
- ├── Collections
- ├── Exception Handling
- └── Interfaces
-
-Spring Boot
- │
- ├── REST APIs
- ├── Dependency Injection
- ├── IoC
- ├── Controllers
- ├── Services
- └── Configuration
-
-Database
- │
- ├── PostgreSQL
- ├── SQL
- ├── JPA
- ├── Hibernate
- └── Entity Relationships
-
-Security
- │
- ├── Spring Security
- ├── Authentication
- ├── Authorization
- └── Role-Based Access Control
-
-Development
- │
- ├── Maven
- ├── Git
- ├── GitHub
- └── Postman
-```
-
----
-
-# 🔮 Future Enhancements
-
-Potential future improvements include:
-
-* Email notifications
-* File attachments
-* Search and filtering
-* Pagination and sorting
-* SLA management
-* Dashboard and analytics
-* Audit logging
-* Docker deployment
-* Cloud deployment
-* Automated testing
-* API documentation using Swagger/OpenAPI
-* Frontend integration
-
----
-
-# 👨‍💻 Author
-
-**Indra Kumar V**
-
-Computer Science Engineering — Cyber Security
-
-GitHub:
-https://github.com/indraik
-
----
-
-# 📄 License
-
-This project is developed for educational, portfolio, and learning purposes.
-
----
-
-## ⭐ ServiceDesk Pro
-
-A practical enterprise-style Service Desk backend built to demonstrate **Java + Spring Boot + PostgreSQL + REST API + Security + JPA/Hibernate** development.
+GitHub: https://github.com/Indraik
